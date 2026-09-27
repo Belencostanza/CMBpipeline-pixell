@@ -1,0 +1,90 @@
+{
+    # =========================================================================
+    #  CMBpipeline-pixell: training dataset on CAR cut-out maps (Task 2)
+    #  Same format and, where possible, same values as ../CMBpipeline/source/config.dict
+    #  (SO "rect" case). Differences are listed in docs/03_task2_dataset_plan.md.
+    # =========================================================================
+
+    # =========================================================================
+    #  Sky / geometry
+    # =========================================================================
+    "mask_type":            "rect",       # SO-like hits mask (only case supported here)
+    "nside":                512,          # HEALPix resolution of the SO mask / hits map
+    "res_arcmin":           9.6,          # CAR resolution (fejer1 full sky, 1125 x 2250), matched to CMBpipeline's plane pitch
+    "npixels_x":            1120,         # CAR cut-out around the SO mask: nx (RA), multiple of 32
+    "npixels_y":            320,          # ny (Dec), multiple of 32
+
+    # =========================================================================
+    #  CMB signal
+    # =========================================================================
+    "r":                    0.034,
+    "lmin":                 4,
+    "lmax":                 1000,         # analysis lmax (binning), as CMBpipeline
+    "lmax_sim":             1535,         # band limit of the simulated a_lm (= 3 nside - 1, CMBpipeline's synfast default)
+
+    "cosmo_fid": {
+        "H0":    67.5,
+        "ombh2": 0.022,
+        "omch2": 0.122,
+        "tau":   0.06,
+        "ns":    0.965,
+        "As":    2e-9,
+        "mnu":   0.06,
+    },
+
+    # =========================================================================
+    #  Binning (utilities.compute_bins_fractional), as CMBpipeline
+    # =========================================================================
+    "binning": {
+        "frac":        0.2,
+        "min_width":   20,
+        "extra_edges": None,
+        "label":       "newbin5",
+    },
+
+    # =========================================================================
+    #  Beam
+    # =========================================================================
+    "fwhm_arcmin":          23.0,         # applied to a_E, a_B (almxfl) when smooth = True
+
+    # =========================================================================
+    #  Noise
+    # =========================================================================
+    "noise_type":           "inho",
+    "inho_type":            "so_hits",    # sigma^2 per CAR pixel from the SO hits map (analytic, no 2D variance file)
+    "DEFAULT_NOISE_LEVEL":  5e-7,         # white-noise level [muK^2 sr] (2.43 muK-arcmin), as CMBpipeline
+
+    # =========================================================================
+    #  Rescaling factor used by the training loader (not by the dataset)
+    # =========================================================================
+    "map_rescale_factor": {
+        "rect": 0.8382,                   # CMBpipeline value; may need retuning for CAR maps
+    },
+
+    # =========================================================================
+    #  Dataset
+    # =========================================================================
+    "smooth":               True,
+    "apo":                  False,
+    "nsims_train":          1000,
+    "nsims_valid":          100,
+    "nsims_test":           30,
+    "cmb_seed0":            0,            # map i uses CMB seed cmb_seed0 + i (valid maps: i = nsims_train ...)
+    "noise_seed0":          100000,       # map i uses noise seed noise_seed0 + i
+
+    # =========================================================================
+    #  Folders (IAS cluster, new project: nothing of CMBpipeline is overwritten)
+    # =========================================================================
+    "root_folder":          "/home/bcostanza/wf-curve-pixell/",
+    "data_folder":          "/data/bcostanza/curve-pixell/",          # train/valid .pt
+    "aux_folder":           "aux/",                                   # mask, hits, variance (CAR, with WCS), spectra, seeds
+    "dataset_tag":          "nCMB_r034_beam_car9.6_cut1120x320_maskSO_inho_hitsSO",
+
+    # =========================================================================
+    #  Input files
+    # =========================================================================
+    "mask_files": {
+        "so_hits": "aux/norm_nHits_SA_35FOV_ns512.fits",              # to be placed in aux_folder on the cluster (step 3)
+    },
+    "cmbpipeline_source":   "/home/bcostanza/CMBpipeline/source",     # read-only; location on the cluster to be checked (step 3)
+}
