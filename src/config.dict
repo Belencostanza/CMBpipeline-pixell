@@ -75,7 +75,7 @@
     # =========================================================================
     #  Folders (IAS cluster, new project: nothing of CMBpipeline is overwritten)
     # =========================================================================
-    "root_folder":          "/home/bcostanza/wf-curve-pixell/",
+    "root_folder":          "/home/bcostanza/wf-curve-pixell/",       # clone of this repository
     "data_folder":          "/data/bcostanza/curve-pixell/",          # train/valid .pt
     "aux_folder":           "aux/",                                   # mask, hits, variance (CAR, with WCS), spectra, seeds
     "dataset_tag":          "nCMB_r034_beam_car9.6_cut1120x320_maskSO_inho_hitsSO",
@@ -84,7 +84,7 @@
     #  Input files
     # =========================================================================
     "mask_files": {
-        "so_hits": "aux/norm_nHits_SA_35FOV_ns512.fits",              # to be placed in aux_folder on the cluster (step 3)
+        "so_hits": "/home/bcostanza/wf-curve/SO-like/norm_nHits_SA_35FOV_ns512.fits",   # same file (md5) as CMBpipeline's
     },
-    "cmbpipeline_source":   "/home/bcostanza/CMBpipeline/source",     # read-only; location on the cluster to be checked (step 3)
+    "cmbpipeline_source":   "/home/bcostanza/wf-curve/pol/",          # CMBpipeline code on the cluster, read-only (utilities.py, projections.py: same md5 as ../CMBpipeline/source)
 }
