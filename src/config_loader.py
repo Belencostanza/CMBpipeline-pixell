@@ -9,6 +9,7 @@ Derived keys:
   folders (absolute, trailing "/", created on demand): root_folder, data_folder, aux_folder
   files: name_train, name_valid, so_hits_path, spectra_path, seeds_path,
          mask_car_path, hits_car_path, variance_car_path
+  training (if the keys exist): model_path, loss_path, study_db
   misc:  map_rescale_factor (scalar for the active mask_type), fwhm_rad, bin_kwargs
 The folder in cfg["cmbpipeline_source"] is appended to sys.path (read-only use of CMBpipeline).
 """
@@ -32,6 +33,7 @@ REQUIRED_KEYS = [
 ]
 
 OUTPUT_FOLDERS = ["data_folder", "aux_folder"]
+TRAINING_FOLDERS = ["study_folder", "model_folder", "loss_folder"]   # optional (training_car.py)
 
 
 # --------------------------------------------------------------------------- #
@@ -111,10 +113,11 @@ def load_config(path=None, create_dirs=True):
     cfg["config_file"] = cfg_file
     root = as_folder(os.path.dirname(cfg_file), cfg["root_folder"])
     cfg["root_folder"] = root
-    for key in OUTPUT_FOLDERS:
+    folders = OUTPUT_FOLDERS + [k for k in TRAINING_FOLDERS if k in cfg]
+    for key in folders:
         cfg[key] = as_folder(root, cfg[key])
     if create_dirs:
-        for key in OUTPUT_FOLDERS:
+        for key in folders:
             os.makedirs(cfg[key], exist_ok=True)
 
     # files
@@ -127,6 +130,13 @@ def load_config(path=None, create_dirs=True):
     cfg["mask_car_path"]     = as_file(aux, f"mask_car_{tag}.fits")
     cfg["hits_car_path"]     = as_file(aux, f"hits_car_{tag}.fits")
     cfg["variance_car_path"] = as_file(aux, f"variance_car_{tag}.fits")
+
+    # training (as CMBpipeline's config_loader)
+    if "model_folder" in cfg:
+        cfg["model_path"] = cfg["model_folder"]
+        cfg["loss_path"]  = cfg["loss_folder"]
+    if "study_name" in cfg:
+        cfg["study_db"] = "sqlite:///" + as_file(cfg["study_folder"], f"{cfg['study_name']}.db")
 
     # read-only use of CMBpipeline (appended: modules of this repository keep precedence)
     src = as_folder(root, cfg["cmbpipeline_source"])

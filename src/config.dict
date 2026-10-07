@@ -58,8 +58,8 @@
     #  Rescaling factor used by the training loader (not by the dataset)
     # =========================================================================
     "map_rescale_factor": {
-        "rect": 0.8382,                   # CMBpipeline value; may need retuning for CAR maps
-    },
+        "rect": 0.75068694,               # 1/std(Q_obs) of the 100 CAR validation maps (all pixels; notebooks/02_dataset_check.ipynb)
+    },                                    # CMBpipeline (plane maps): 0.8382
 
     # =========================================================================
     #  Dataset
@@ -73,11 +73,29 @@
     "noise_seed0":          100000,       # map i uses noise seed noise_seed0 + i
 
     # =========================================================================
+    #  Training (training_car.py), as CMBpipeline + curved-sky loss settings
+    # =========================================================================
+    "epochs":               200,
+    "loss_j3":              True,         # only J3 is implemented for CAR (losses_car.CarLossJ3)
+    "batch_size":           1,
+    "n_trials":             10,           # Optuna trials (CMBpipeline: 10)
+    "sht_lmax":             1124,         # band limit of the loss transforms (fejer1 limit at 9.6')
+    "sht_method":           "cyl",        # pixell map2alm/alm2map method on the cut-out ('cyl' ~2x faster than '2d', same result for band-limited maps)
+    "sht_nthread":          16,           # ducc threads for the transforms
+    "fixed_params":         None,         # dict of filters0..3, lr, wd: one fixed trial instead of Optuna (short tests)
+    "nuse_train":           None,         # use only the first n train / valid maps (short tests)
+    "nuse_valid":           None,
+    "study_name":           "carj3_nCMB_r034_beam_car9.6_cut1120x320_maskSO_inho_hitsSO",
+
+    # =========================================================================
     #  Folders (IAS cluster, new project: nothing of CMBpipeline is overwritten)
     # =========================================================================
     "root_folder":          "/home/bcostanza/wf-curve-pixell/",       # clone of this repository
     "data_folder":          "/data/bcostanza/curve-pixell/",          # train/valid .pt
     "aux_folder":           "aux/",                                   # mask, hits, variance (CAR, with WCS), spectra, seeds
+    "study_folder":         "studies/",                               # optuna sqlite .db
+    "model_folder":         "optuna/models200_carj3_nCMB_r034_beam_car9.6_cut1120x320_maskSO_inho_hitsSO/",
+    "loss_folder":          "optuna/losses200_carj3_nCMB_r034_beam_car9.6_cut1120x320_maskSO_inho_hitsSO/",
     "dataset_tag":          "nCMB_r034_beam_car9.6_cut1120x320_maskSO_inho_hitsSO",
 
     # =========================================================================
