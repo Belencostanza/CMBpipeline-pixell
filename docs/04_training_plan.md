@@ -170,3 +170,28 @@ Not in this task: evaluating the Wiener-filter quality, and the OQE/Fisher steps
 2. **Band-limited output** ŷ_WF = Y A ŷ (recommended), or keep the raw network output as the Wiener-filter map?
 3. **Search budget:** a full 10-trial Optuna search, or start from CMBpipeline's selected hyperparameters? If the latter, which study or model was the final one? The cluster log mixes several studies.
 4. **`map_rescale_factor` = 0.75068694:** how was it computed? I'll record that in the config comment so it can be reproduced.
+
+---
+
+## 7. Results of steps 1 and 2 (2026-10-07)
+
+**Step 1** (`notebooks/03_loss_check.ipynb`, local CPU):
+- **Gradients:** `gradcheck` passes for both transforms (`'cyl'` and `'2d'`) and for the whole J3. The adjoints on the 1120 × 320 cut-out agree to 4×10⁻¹⁴.
+- **Data term:** at the true signal of validation maps 0–2 (regenerated exactly from their seeds), term 1 / (2 N_obs/N_pix) = 0.997–0.999 with the signal band-limited to ℓ ≤ 1124. With the full ℓ ≤ 1535 signal it is 1.005–1.006, because ℓ > 1124 power aliases.
+- **Prior term:**
+  - the E part / f_sky Σ(2ℓ+1) = 0.999;
+  - the B part = 1.84, from E→B leakage at the rectangle's edges (an E-only field already gives 0.86 of the expected B prior). CMBpipeline's periodic FFT prior has the same effect at the torus wrap.
+- **Band limit:** ‖YA(YAŷ) − YAŷ‖/‖YAŷ‖ ≈ 1 % in the mask (true signal and untrained network), so Y A acts almost as a projector.
+- **`'cyl'` instead of `'2d'`:** same prior per ℓ range (to 10⁻⁴) and same beam operator (to 2×10⁻⁴) for band-limited maps; the transforms are 2.2× faster.
+
+**Step 2** (job 17385188, H200 on apollo03, 16 threads; 3 epochs, 100 + 20 maps, CMBpipeline's best trial filters [16, 40, 64, 152], lr 5.03×10⁻⁵, wd 1.61×10⁻⁵):
+
+| epoch | s/step | transforms per step | train loss | valid loss |
+|---|---|---|---|---|
+| 0 | 0.173 | 0.077 s | 261.0 | 32.2 |
+| 1 | 0.133 | 0.076 s (57 %) | 22.8 | 17.6 |
+| 2 | 0.131 | 0.074 s (57 %) | 16.2 | 15.8 |
+
+- **Projected cost:** 1000 maps → ≈ 131 s of training + ≈ 9 s of validation ≈ **2.3 min per epoch**, so ≈ 7.8 h per 200-epoch trial and ≈ 78 h for 10 trials. CMBpipeline: ≈ 2 min per epoch, ≈ 65 h (its GPU type is not recorded in the log).
+- **Reference loss values** (map 0): J3(ŷ = 0) = 39.5; J3(true signal, ℓ ≤ 1535) = 8.9; J3(true signal band-limited to 1124) = 3.05. The Wiener filter minimizes J3, so a trained network should end below these. They are not comparable to CMBpipeline's 1.0–1.4, because the prior is counted over different modes.
+- **Partition:** h200's time limit is 1 day, enough for 2–3 trials per job; apollo's is 7 days. The Optuna study (sqlite, `load_if_exists`) can continue across jobs.

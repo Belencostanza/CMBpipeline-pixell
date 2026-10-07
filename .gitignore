@@ -5,3 +5,4 @@ aux/
 logs/
 optuna/
 studies/
+test/
