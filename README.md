@@ -100,7 +100,7 @@ python run_dataset.py                                     # uses src/config.dict
 WF_CONFIG=/path/to/other_config.dict python run_dataset.py
 ```
 
-**Status.** The cluster run (output in a new project directory, `/data/bcostanza/curve-pixell/`) is not set up yet. Training still needs the curved-sky counterparts of CMBpipeline's flat-sky loss and OQE steps, and possibly a new `map_rescale_factor`.
+**Status.** The full dataset was generated on the IAS cluster on 2026-10-07 (slurm job 17385111, commit `119a121`, `sbatch slurm/data.sh`, 9 min 50 s): `train_…pt` (1000, 4, 320, 1120) and `valid_…pt` (100, 4, 320, 1120) in `/data/bcostanza/curve-pixell/`, auxiliary files in `/home/bcostanza/wf-curve-pixell/aux/`. Training maps 0–2 are identical to the local test maps (same seeds). Code structure and run instructions: `docs/code_structure.html`. Training still needs the curved-sky counterparts of CMBpipeline's flat-sky loss and OQE steps, and possibly a new `map_rescale_factor`.
 
 ## Requirements
 

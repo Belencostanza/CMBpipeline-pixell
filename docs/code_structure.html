@@ -1,0 +1,298 @@
+<title>CMBpipeline-pixell Code Map</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,650&family=Source+Sans+3:wght@400;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: one reading column; the data-flow diagram and tables scroll inside their own boxes. */
+:root {
+  --bg: #f6f7f9;
+  --surface: #ffffff;
+  --fg: #1d2330;
+  --muted: #5a6475;
+  --line: #d9dee7;
+  --accent: #2357a6;      /* "polarization blue" */
+  --accent-soft: #e6eefb;
+  --code-bg: #eef1f5;
+  --ok: #1f7a4d;
+  --warn: #9a5b00;
+  --f-display: "Fraunces", Georgia, "Times New Roman", serif;
+  --f-body: "Source Sans 3", "Segoe UI", system-ui, sans-serif;
+  --f-mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #12161d; --surface: #1a1f28; --fg: #e3e7ee; --muted: #9aa4b5; --line: #2c3442;
+    --accent: #8fb4f0; --accent-soft: #1d2a40; --code-bg: #222935; --ok: #6fcf9d; --warn: #e3ae5c;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #12161d; --surface: #1a1f28; --fg: #e3e7ee; --muted: #9aa4b5; --line: #2c3442;
+  --accent: #8fb4f0; --accent-soft: #1d2a40; --code-bg: #222935; --ok: #6fcf9d; --warn: #e3ae5c;
+  color-scheme: dark;
+}
+body { background: var(--bg); color: var(--fg); font-family: var(--f-body); font-size: 16.5px; line-height: 1.6; }
+.wrap { max-width: 860px; margin: 0 auto; padding-inline: 20px; padding-block: 40px 64px; display: flex; flex-direction: column; gap: 40px; }
+header { display: flex; flex-direction: column; gap: 10px; }
+.eyebrow { font-family: var(--f-mono); font-size: 12.5px; letter-spacing: .08em; text-transform: uppercase; color: var(--accent); }
+h1 { font-family: var(--f-display); font-weight: 650; font-size: clamp(30px, 5vw, 42px); line-height: 1.12; margin: 0; text-wrap: balance; }
+h2 { font-family: var(--f-display); font-weight: 650; font-size: 25px; margin: 0; text-wrap: balance; }
+h3 { font-family: var(--f-body); font-weight: 600; font-size: 17.5px; margin: 0; }
+p { margin: 0; max-width: 68ch; }
+.lede { font-size: 18px; color: var(--muted); }
+section { display: flex; flex-direction: column; gap: 16px; }
+code, pre { font-family: var(--f-mono); font-size: 13.5px; }
+code { background: var(--code-bg); padding: 1px 5px; border-radius: 4px; }
+pre { background: var(--code-bg); padding: 14px 16px; border-radius: 6px; overflow-x: auto; margin: 0; line-height: 1.5; }
+pre code { background: none; padding: 0; }
+.scroll { overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; font-size: 15px; }
+th, td { text-align: left; vertical-align: top; padding: 9px 12px 9px 0; border-bottom: 1px solid var(--line); }
+th { font-size: 12.5px; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+td:first-child { white-space: nowrap; }
+ul { margin: 0; padding-left: 20px; display: flex; flex-direction: column; gap: 6px; max-width: 68ch; }
+.files { display: flex; flex-direction: column; gap: 0; border-top: 1px solid var(--line); }
+.file { display: grid; grid-template-columns: 210px 1fr; gap: 16px; padding-block: 16px; border-bottom: 1px solid var(--line); }
+.file > * { min-width: 0; }
+.file .name { font-family: var(--f-mono); font-size: 14px; font-weight: 500; color: var(--accent); word-break: break-word; }
+.file .role { font-size: 12.5px; color: var(--muted); font-family: var(--f-mono); }
+.file .body { display: flex; flex-direction: column; gap: 8px; }
+.tag { display: inline-block; font-family: var(--f-mono); font-size: 11.5px; padding: 1px 7px; border-radius: 10px; border: 1px solid var(--line); color: var(--muted); margin-right: 4px; }
+.tag.t2 { border-color: var(--accent); color: var(--accent); background: var(--accent-soft); }
+.diagram { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 16px; overflow-x: auto; }
+.note { border-left: 3px solid var(--warn); padding: 4px 0 4px 14px; color: var(--fg); max-width: 68ch; }
+.status { display: inline-block; font-family: var(--f-mono); font-size: 12px; padding: 2px 8px; border-radius: 10px; background: var(--accent-soft); color: var(--accent); }
+.steps { counter-reset: s; list-style: none; padding: 0; gap: 14px; }
+.steps > li { counter-increment: s; display: grid; grid-template-columns: 28px 1fr; gap: 10px; }
+.steps > li > div { min-width: 0; display: flex; flex-direction: column; gap: 8px; }
+.steps > li::before { content: counter(s); font-family: var(--f-display); font-weight: 650; color: var(--accent); font-size: 19px; line-height: 1.3; }
+a { color: var(--accent); }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+@media (max-width: 640px) {
+  .file { grid-template-columns: 1fr; gap: 6px; }
+  td:first-child { white-space: normal; }
+}
+</style>
+
+<div class="wrap">
+
+<header>
+  <span class="eyebrow">CMBpipeline-pixell · Tasks 1–2</span>
+  <h1>How the code fits together</h1>
+  <p class="lede">A map of the repository: what each script does, which ones call which, and how to build the DeepWiener training set on a laptop or on the IAS cluster.</p>
+</header>
+
+<section>
+  <h2>The idea in one paragraph</h2>
+  <p>CMBpipeline projects spherical Q/U maps onto a flat tangent plane, interpolates them onto a grid and uses flat-sky FFTs. This repository keeps the maps on the sphere: Q/U are synthesised directly with <code>pixell.curvedsky</code> on a CAR cut-out (9.6′, 1120 × 320 pixels) of an exact full-sky grid, so curved-sky transforms stay exact. Task 1 measured what the projection costs; Task 2 produces the training tensors for <code>DeepWiener_threechannels</code> on these CAR maps, with exactly CMBpipeline's channel layout.</p>
+</section>
+
+<section>
+  <h2>Repository layout</h2>
+<pre><code>CMBpipeline-pixell/
+├── TASK1.md, TASK2.md          task descriptions
+├── README.md                   summary of both tasks and results
+├── docs/                       written documentation and reports
+├── src/                        reusable code (this page describes it)
+│   ├── config.dict             parameters + paths (IAS cluster)
+│   ├── config_loader.py        reads config.dict, derives file names
+│   ├── make_dataset.py         class make_dataset (Task 2 core)
+│   ├── run_dataset.py          entry point: builds train/valid tensors
+│   ├── sky_input.py            Task 1: seeded a_lm, spectra, beam
+│   ├── cmbpipeline_a.py        Task 1: CMBpipeline (pipeline A) wrappers
+│   ├── pixell_tools.py         Task 1: CAR mask, rotations, patches
+│   └── spectrum_tools.py       Tasks 1–2: binning and spectrum estimators
+├── slurm/data.sh               cluster job for run_dataset.py
+├── notebooks/                  analyses (01: Task 1, 02: Task 2 checks)
+└── results/                    local outputs, not versioned
+../CMBpipeline/source/          existing pipeline, imported READ-ONLY</code></pre>
+</section>
+
+<section>
+  <h2>How the pieces call each other</h2>
+  <p>Solid arrows are imports or calls. CMBpipeline is only read: its fiducial spectrum (<code>utilities.signal_spectrum</code>) and its SO mask (<code>projections.sph_mask.make_SO_mask</code>), so both pipelines use the same sky and footprint.</p>
+  <div class="diagram">
+<pre class="mermaid">
+flowchart LR
+  subgraph T2["Task 2: dataset"]
+    CFG["config.dict"] --> CL["config_loader.py<br/>load_config()"]
+    SL["slurm/data.sh"] --> RD["run_dataset.py"]
+    CL --> RD
+    RD --> MD["make_dataset.py<br/>class make_dataset"]
+  end
+  subgraph CP["../CMBpipeline/source (read-only)"]
+    U["utilities.py<br/>signal_spectrum"]
+    P["projections.py<br/>make_SO_mask"]
+    N["network_2d.py<br/>DeepWiener_threechannels"]
+  end
+  MD --> U
+  MD --> P
+  MD --> OUT[("train_*.pt / valid_*.pt<br/>aux/*.fits, spectra, seeds")]
+  subgraph T1["Task 1: validation helpers"]
+    SI["sky_input.py"]
+    CA["cmbpipeline_a.py"]
+    PT["pixell_tools.py"]
+    ST["spectrum_tools.py"]
+  end
+  SI --> U
+  CA --> P
+  CA --> U
+  NB1["01_pixell_validation.ipynb"] --> SI & CA & PT & ST
+  NB2["02_dataset_check.ipynb"] --> CL & MD & CA & ST & N
+  OUT --> NB2
+</pre>
+  </div>
+</section>
+
+<section>
+  <h2>The scripts, one by one</h2>
+  <div class="files">
+
+    <div class="file">
+      <div><div class="name">config.dict</div><div class="role">parameters</div></div>
+      <div class="body">
+        <p>A Python dict literal in CMBpipeline's format. Same values as CMBpipeline (SO "rect" mask, r = 0.034, 23′ beam, noise 5×10⁻⁷ μK² sr, 1000 / 100 / 30 maps) plus the CAR keys: <code>res_arcmin = 9.6</code>, <code>npixels_x × npixels_y = 1120 × 320</code>, <code>lmax_sim = 1535</code> and explicit seeds <code>cmb_seed0 = 0</code>, <code>noise_seed0 = 100000</code>.</p>
+        <p>Paths point to the cluster: code in <code>/home/bcostanza/wf-curve-pixell/</code>, tensors in <code>/data/bcostanza/curve-pixell/</code>, CMBpipeline code read from <code>/home/bcostanza/wf-curve/pol/</code>. Every difference with CMBpipeline's config is listed in <code>docs/03_task2_dataset_plan.md</code>.</p>
+        <div><span class="tag t2">Task 2</span></div>
+      </div>
+    </div>
+
+    <div class="file">
+      <div><div class="name">config_loader.py</div><div class="role">load_config(), bin_edges()</div></div>
+      <div class="body">
+        <p>Finds the config (explicit path → <code>$WF_CONFIG</code> → <code>./config.dict</code> → next to the module), checks required keys, checks that both image sides are multiples of 32, and derives absolute file names: <code>name_train</code>, <code>name_valid</code>, <code>mask_car_path</code>, <code>variance_car_path</code>, <code>spectra_path</code>, <code>seeds_path</code>… It also appends the CMBpipeline source folder to <code>sys.path</code>, after this repository's own modules so these keep precedence.</p>
+        <p>Point it at another config with <code>WF_CONFIG=/path/config.dict</code>. The local test uses <code>results/task2/config_local.dict</code> (3 + 2 maps, local paths).</p>
+        <div><span class="tag t2">Task 2</span></div>
+      </div>
+    </div>
+
+    <div class="file">
+      <div><div class="name">make_dataset.py</div><div class="role">class make_dataset</div></div>
+      <div class="body">
+        <p>The core of Task 2. Same class name and method layout as CMBpipeline's <code>make_dataset</code>. For each map:</p>
+        <ul>
+          <li><b>Geometry</b> — <code>get_sky_region</code> reads the SO mask and hits with CMBpipeline's <code>make_SO_mask</code>; <code>car_geometry</code> cuts 1120 × 320 pixels around the mask out of the 9.6′ fejer1 full-sky grid; <code>healpix_to_car</code> copies mask and hits to CAR (value of the HEALPix pixel containing each CAR pixel centre).</li>
+          <li><b>Signal</b> — <code>get_alm</code>: <code>curvedsky.rand_alm</code> from the CMBpipeline spectrum, beam applied to a<sub>E</sub>, a<sub>B</sub>; <code>get_QUmaps_car</code>: <code>curvedsky.alm2map(spin=2)</code> straight onto the cut-out.</li>
+          <li><b>Noise</b> — <code>get_inhomogenous_noise</code>: σ² = N(n̂)/Ω<sub>pixel</sub>, with N(n̂) CMBpipeline's hits-based noise per steradian. Because CAR pixels shrink as cos(Dec) (27 → 84 arcmin² over the footprint), σ² rises toward the southern edge while the noise power spectrum stays flat at N. <code>get_inho_noise</code> draws one realization.</li>
+          <li><b>Assembly</b> — <code>make_inho_maps_car</code> returns mask × (signal + noise); <code>make_train_dataset</code> loops over maps and writes the tensors and auxiliary files.</li>
+        </ul>
+        <div><span class="tag t2">Task 2</span></div>
+      </div>
+    </div>
+
+    <div class="file">
+      <div><div class="name">run_dataset.py</div><div class="role">entry point</div></div>
+      <div class="body">
+        <p>Same role as CMBpipeline's <code>run_dataset.py</code>: <code>load_config()</code> → <code>make_dataset(...)</code> → <code>make_train_dataset(...)</code>, then prints the elapsed time. It holds no logic of its own; everything comes from the config.</p>
+        <div><span class="tag t2">Task 2</span></div>
+      </div>
+    </div>
+
+    <div class="file">
+      <div><div class="name">slurm/data.sh</div><div class="role">cluster job</div></div>
+      <div class="body">
+        <p>Activates <code>torch_cmb</code>, moves to <code>src/</code>, logs the git commit and runs <code>run_dataset.py</code>. 4 CPUs, 32 GB, 4 h; the log goes to <code>/home/bcostanza/wf-curve-pixell/logs/data_&lt;jobid&gt;.out</code>.</p>
+        <div><span class="tag t2">Task 2</span></div>
+      </div>
+    </div>
+
+    <div class="file">
+      <div><div class="name">sky_input.py</div><div class="role">get_spectra, beam, make_alm, shell_alm</div></div>
+      <div class="body">
+        <p>Task 1's common input: one set of seeded, beamed a<sub>ℓm</sub> from CMBpipeline's fiducial spectrum, optionally E-only or a narrow ℓ-shell (for mode-mixing tests). Importing it also puts <code>../CMBpipeline/source</code> on the path.</p>
+        <div><span class="tag">Task 1</span></div>
+      </div>
+    </div>
+
+    <div class="file">
+      <div><div class="name">cmbpipeline_a.py</div><div class="role">so_geometry, qu_to_plane, plane_eb …</div></div>
+      <div class="body">
+        <p>Pipeline A: the current CMBpipeline as plain functions calling its own code (ψ rotation, equidistant projection, Clough–Tocher interpolation, flat E/B). Used to compare against CMBpipeline without running its cluster-bound <code>geometry.py</code>. Notebook 02 uses it to build a CMBpipeline map for comparison.</p>
+        <div><span class="tag">Task 1</span><span class="tag t2">Task 2 check</span></div>
+      </div>
+    </div>
+
+    <div class="file">
+      <div><div class="name">pixell_tools.py</div><div class="role">car_mask, w2_car, rotation_to_equator, patch_geometry</div></div>
+      <div class="body">
+        <p>pixell helpers for pipelines B (CAR on the sphere) and C (CAR patch rotated to the equator, then flat FFT).</p>
+        <div><span class="tag">Task 1</span></div>
+      </div>
+    </div>
+
+    <div class="file">
+      <div><div class="name">spectrum_tools.py</div><div class="role">bin_cl, flat_spectrum_*, curved_spectrum, …</div></div>
+      <div class="body">
+        <p>Binning and power-spectrum estimators shared by all pipelines: CMBpipeline's flat estimator, pixell's flat <code>enmap</code> estimator, the curved-sky <code>alm2cl</code>/w₂ estimator, and paired statistics.</p>
+        <div><span class="tag">Task 1</span><span class="tag t2">Task 2 check</span></div>
+      </div>
+    </div>
+
+    <div class="file">
+      <div><div class="name">notebooks/</div><div class="role">analysis, not imported</div></div>
+      <div class="body">
+        <p><code>01_pixell_validation.ipynb</code>: Task 1, pipelines A/B/C, leakage, mode mixing, 50-realization ensemble. <code>02_dataset_check.ipynb</code>: Task 2 local checks — shapes, channels, noise level against CMBpipeline, analytic vs empirical σ², spectra (now against C<sub>ℓ</sub>B<sub>ℓ</sub>² + N), and a forward pass of an untrained network.</p>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<section>
+  <h2>What one training sample looks like</h2>
+  <div class="scroll">
+  <table>
+    <thead><tr><th>Channel</th><th>Content</th><th>Units</th><th>Notes</th></tr></thead>
+    <tbody>
+      <tr><td>0</td><td>Q<sub>obs</sub> = mask · (Q + n<sub>Q</sub>)</td><td>μK</td><td>0 outside the mask</td></tr>
+      <tr><td>1</td><td>U<sub>obs</sub> = mask · (U + n<sub>U</sub>)</td><td>μK</td><td>0 outside the mask</td></tr>
+      <tr><td>2</td><td>binary mask</td><td>–</td><td>same in every sample</td></tr>
+      <tr><td>3</td><td>pixel noise variance σ²</td><td>μK²</td><td>analytic; same in every sample</td></tr>
+    </tbody>
+  </table>
+  </div>
+  <p>Tensors are <code>float32</code> of shape <code>(N, 4, 320, 1120)</code>: 5.7 GB for the 1000 training maps, 0.57 GB for the 100 validation maps. No normalization is stored: the training loader subtracts each map's mean and applies <code>map_rescale_factor</code>, as in CMBpipeline. Map <i>i</i> uses CMB seed <code>cmb_seed0 + i</code> and noise seed <code>noise_seed0 + i</code>; validation maps continue after the training ones, so no seed repeats.</p>
+  <p>Next to the tensors, <code>aux/</code> holds the CAR mask, hits and σ² maps as FITS (with their WCS, so later steps can return to the sphere), the cached spectra and the seed list.</p>
+</section>
+
+<section>
+  <h2>How to run it</h2>
+  <ol class="steps">
+    <li><div>
+      <h3>Small local test</h3>
+      <p>Uses <code>results/task2/config_local.dict</code> (3 train + 2 valid maps, local paths). Requires <code>../CMBpipeline/source</code> next to the repository.</p>
+<pre><code>cd src
+WF_CONFIG=../results/task2/config_local.dict python run_dataset.py</code></pre>
+      <p>Then open <code>notebooks/02_dataset_check.ipynb</code> to check the result.</p>
+    </div></li>
+    <li><div>
+      <h3>Full dataset on the IAS cluster</h3>
+      <p>Log in through the gateway to the submit node, then submit from the repository root:</p>
+<pre><code>ssh bcostanza@ssh.sns.ias.edu
+ssh apollo-login1.sns.ias.edu
+cd /home/bcostanza/wf-curve-pixell
+git pull                      # get the latest code
+mkdir -p logs
+sbatch slurm/data.sh
+squeue -u bcostanza           # follow the job
+tail logs/data_&lt;jobid&gt;.out</code></pre>
+      <p>Outputs: <code>/data/bcostanza/curve-pixell/train_nCMB_r034_beam_car9.6_cut1120x320_maskSO_inho_hitsSO.pt</code> and <code>valid_…pt</code>; auxiliary files in <code>/home/bcostanza/wf-curve-pixell/aux/</code>.</p>
+    </div></li>
+    <li><div>
+      <h3>Changing parameters</h3>
+      <p>Edit <code>src/config.dict</code>, or copy it and point <code>WF_CONFIG</code> at the copy. Change <code>dataset_tag</code> whenever you change the physics, so new files never overwrite old ones.</p>
+    </div></li>
+  </ol>
+  <p class="note">Environment: the cluster's <code>torch_cmb</code> env needed pixell; <code>pixell 0.32.7</code> (same as local) was added with pip on 2026-10-07. Nothing else was upgraded. The cluster has ducc0 0.41 vs 0.38 locally.</p>
+</section>
+
+<section>
+  <h2>Status and open points</h2>
+  <ul>
+    <li><b>Done:</b> the full dataset was generated on 2026-10-07 (job 17385111, commit <code>119a121</code>, 9 min 50 s, 7 GB peak memory). Training maps 0–2 are identical to the local test maps, which used the same seeds.</li>
+    <li>Training itself is not part of Task 2. CMBpipeline's loss (<code>losses.py</code>) and OQE (<code>PowerSpectrum.py</code>) use flat-sky FFTs with dx, dy and ℓ = |k|; on CAR maps they need curved-sky counterparts.</li>
+    <li><code>map_rescale_factor</code> (0.8382) comes from CMBpipeline and may need retuning for CAR pixel statistics.</li>
+    <li>The σ² channel varies with Dec because of the CAR pixel area. This is the correct per-pixel variance and gives the right noise spectrum, but the network has to learn the cos(Dec) pattern; band-limited noise is an alternative if that turns out to hurt training.</li>
+  </ul>
+</section>
+
+</div>
