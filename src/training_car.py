@@ -242,7 +242,10 @@ if __name__ == '__main__':
         direction="minimize",
         load_if_exists=True
         )
-        study.optimize(objective, n_trials=cfg["n_trials"])
+        # N_TRIALS (environment) overrides cfg["n_trials"]: the study can be split over several jobs
+        n_trials = int(os.environ.get("N_TRIALS", cfg["n_trials"]))
+        print("Optuna trials in this job:", n_trials, "| trials already in the study:", len(study.trials), flush=True)
+        study.optimize(objective, n_trials=n_trials)
 
         print("Best trial:")
         trial = study.best_trial
