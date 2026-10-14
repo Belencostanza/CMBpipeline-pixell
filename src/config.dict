@@ -96,6 +96,7 @@
     "study_folder":         "studies/",                               # optuna sqlite .db
     "model_folder":         "optuna/models200_carj3_nCMB_r034_beam_car9.6_cut1120x320_maskSO_inho_hitsSO/",
     "loss_folder":          "optuna/losses200_carj3_nCMB_r034_beam_car9.6_cut1120x320_maskSO_inho_hitsSO/",
+    "result_folder":        "optuna/results200_carj3_nCMB_r034_beam_car9.6_cut1120x320_maskSO_inho_hitsSO/",   # getbestmodel_car.py output
     "dataset_tag":          "nCMB_r034_beam_car9.6_cut1120x320_maskSO_inho_hitsSO",
 
     # =========================================================================

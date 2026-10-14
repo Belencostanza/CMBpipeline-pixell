@@ -9,7 +9,7 @@ Derived keys:
   folders (absolute, trailing "/", created on demand): root_folder, data_folder, aux_folder
   files: name_train, name_valid, so_hits_path, spectra_path, seeds_path,
          mask_car_path, hits_car_path, variance_car_path
-  training (if the keys exist): model_path, loss_path, study_db
+  training (if the keys exist): model_path, loss_path, study_db, result_path
   misc:  map_rescale_factor (scalar for the active mask_type), fwhm_rad, bin_kwargs
 The folder in cfg["cmbpipeline_source"] is appended to sys.path (read-only use of CMBpipeline).
 """
@@ -33,7 +33,7 @@ REQUIRED_KEYS = [
 ]
 
 OUTPUT_FOLDERS = ["data_folder", "aux_folder"]
-TRAINING_FOLDERS = ["study_folder", "model_folder", "loss_folder"]   # optional (training_car.py)
+TRAINING_FOLDERS = ["study_folder", "model_folder", "loss_folder", "result_folder"]   # optional (training_car.py)
 
 
 # --------------------------------------------------------------------------- #
@@ -137,6 +137,8 @@ def load_config(path=None, create_dirs=True):
         cfg["loss_path"]  = cfg["loss_folder"]
     if "study_name" in cfg:
         cfg["study_db"] = "sqlite:///" + as_file(cfg["study_folder"], f"{cfg['study_name']}.db")
+    if "result_folder" in cfg:
+        cfg["result_path"] = as_file(cfg["result_folder"], f"results{cfg['epochs']}_{cfg['study_name']}.pt")
 
     # read-only use of CMBpipeline (appended: modules of this repository keep precedence)
     src = as_folder(root, cfg["cmbpipeline_source"])
