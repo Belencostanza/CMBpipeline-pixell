@@ -5,6 +5,9 @@ import time
 import optuna
 from pixell import enmap
 
+from config_loader import load_config
+cfg = load_config()                                 # also puts cmbpipeline_source on sys.path
+
 from network_2d import DeepWiener_threechannels    # ../CMBpipeline/source (read-only)
 from sht_torch import CarSHT
 
@@ -17,9 +20,6 @@ device = "cuda" if torch.cuda.is_available() else "cpu"
 print("Using device", device)
 
 #############################################READ CONFIG#################################################
-
-from config_loader import load_config
-cfg = load_config()
 
 map_rescale_factor_q = cfg["map_rescale_factor"]
 name_valid           = cfg["name_valid"]
